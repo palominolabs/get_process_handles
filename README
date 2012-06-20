@@ -1,0 +1,7 @@
+Simple Mac OSX tool for displaying files and sockets opened by the process with a given PID. Build it by running
+
+make
+
+And run it by running
+
+./get_process_handles pid
