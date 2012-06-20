@@ -8,6 +8,7 @@ static const char* USAGE = "Usage: %s pid\n";
 static const char* INVALID_PID = "Invalid pid: %s\n";
 static const char* UNABLE_TO_GET_PROC_FDS = "Unable to get open file handles for %d\n";
 static const char* OUT_OF_MEMORY = "Out of memory. Unable to allocate buffer with %d bytes\n";
+static const char* OPEN_FILE = "Open file: %s\n";
 
 int main(int argc, char **argv) {
 	// Figure out the PID the user's trying to get info about
@@ -40,7 +41,13 @@ int main(int argc, char **argv) {
 
 	int i;
 	for(i = 0; i < numberOfProcFDs; i++) {
-		printf("Proc FD #%d: %p\n", i, &procFDInfo[i]);
+		if(procFDInfo[i].proc_fdtype == PROX_FDTYPE_VNODE) {
+			struct vnode_fdinfowithpath vnodeInfo;
+			int bytesUsed = proc_pidfdinfo(pid, procFDInfo[i].proc_fd, PROC_PIDFDVNODEPATHINFO, &vnodeInfo, PROC_PIDFDVNODEPATHINFO_SIZE);
+			if (bytesUsed == PROC_PIDFDVNODEPATHINFO_SIZE) {
+				printf(OPEN_FILE, vnodeInfo.pvip.vip_path);
+			}
+		}
 	}
 
 
